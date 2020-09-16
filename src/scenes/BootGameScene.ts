@@ -2,8 +2,9 @@ import Phaser from 'phaser'
 import * as main from 'main'
 
 export default class BootGameScene extends Phaser.Scene {
-    private platforms ? : Phaser.Physics.Arcade.StaticGroup; // "?" means attribute could be undefined
-    private player ? : Phaser.Physics.Arcade.Sprite;
+    private platforms?: Phaser.Physics.Arcade.StaticGroup // "?" means attribute could be undefined
+    private player?: Phaser.Physics.Arcade.Sprite
+    private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
 
     constructor() {
         super('boot-game')
@@ -40,8 +41,24 @@ export default class BootGameScene extends Phaser.Scene {
         this.player.setBounce(0.3)
         this.player.setCollideWorldBounds(true)
         this.physics.add.collider(this.player, this.platforms)
+
+        // key controls
+        this.cursor = this.input.keyboard.createCursorKeys()
     }
 
     // loop
-    update() {}
+    update() {
+        // events
+        if (this.cursor?.left?.isDown) {
+            this.player?.setVelocityX(-160)
+        } else if (this.cursor?.right?.isDown) {
+            this.player?.setVelocityX(160)
+        } else {
+            this.player?.setVelocityX(0)
+        }
+        // jump
+        if (this.cursor?.up?.isDown && this.player?.body.touching.down) {
+            this.player.setVelocityY(-330)
+        }
+    }
 }
