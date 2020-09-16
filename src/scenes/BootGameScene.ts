@@ -24,7 +24,7 @@ export default class BootGameScene extends Phaser.Scene {
         })
     }
 
-    // add objects to the scene
+    // add objects to the scene (init and draw)
     create() {
         this.add.image(0, 0, 'sky').setOrigin(0, 0) // reset the drawing position of the image to the top-left        
 
@@ -44,6 +44,36 @@ export default class BootGameScene extends Phaser.Scene {
 
         // key controls
         this.cursor = this.input.keyboard.createCursorKeys()
+
+        // animations
+        this.anims.create({
+            key: 'playerTurnLeft',
+            frames: this.anims.generateFrameNumbers('dude', {
+                start: 0,
+                end: 3
+            }),
+            frameRate: 10,
+            repeat: -1 // loop infinitely
+        })
+
+        this.anims.create({
+            key: 'playerTurn',
+            frames: [{
+                key: 'dude',
+                frame: 4
+            }],
+            frameRate: 20
+        })
+
+        this.anims.create({
+            key: 'playerTurnRight',
+            frames: this.anims.generateFrameNumbers('dude', {
+                start: 5,
+                end: 8
+            }),
+            frameRate: 10,
+            repeat: -1
+        })
     }
 
     // loop
@@ -51,10 +81,13 @@ export default class BootGameScene extends Phaser.Scene {
         // events
         if (this.cursor?.left?.isDown) {
             this.player?.setVelocityX(-160)
+            this.player?.anims.play('playerTurnLeft',true)
         } else if (this.cursor?.right?.isDown) {
             this.player?.setVelocityX(160)
+            this.player?.anims.play('playerTurnRight',true)
         } else {
             this.player?.setVelocityX(0)
+            this.player?.anims.play('playerTurn')
         }
         // jump
         if (this.cursor?.up?.isDown && this.player?.body.touching.down) {
