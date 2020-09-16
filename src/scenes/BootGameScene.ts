@@ -5,6 +5,8 @@ export default class BootGameScene extends Phaser.Scene {
     private player?: Phaser.Physics.Arcade.Sprite
     private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
     private stars?: Phaser.Physics.Arcade.Group
+    private score: integer = 0
+    private scoreText?: Phaser.GameObjects.Text
 
     constructor() {
         super('boot-game')
@@ -27,6 +29,9 @@ export default class BootGameScene extends Phaser.Scene {
     // add objects to the scene (init and draw)
     create() {
         this.add.image(0, 0, 'sky').setOrigin(0, 0) // reset the drawing position of the image to the top-left        
+
+        // score text
+        this.scoreText = this.add.text(16, 16, "Score: 0", { fontSize: '32px', fill: 'black' })
 
         // platforms
         this.platforms = this.physics.add.staticGroup()
@@ -92,11 +97,15 @@ export default class BootGameScene extends Phaser.Scene {
         this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
     }
 
+    // overlapping handlers
     private collectStar(player: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
         // cast type
         const star = theStar as Phaser.Physics.Arcade.Image
         // hide the collected star
         star.disableBody(true, true)
+        // update score
+        this.score += 10
+        this.scoreText?.setText(`Score: ${this.score}`)
     }
 
     // loop
