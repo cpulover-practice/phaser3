@@ -1,10 +1,10 @@
 import Phaser from 'phaser'
-import * as main from 'main'
 
 export default class BootGameScene extends Phaser.Scene {
     private platforms?: Phaser.Physics.Arcade.StaticGroup // "?" means attribute could be undefined
     private player?: Phaser.Physics.Arcade.Sprite
     private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
+    private stars?: Phaser.Physics.Arcade.Group
 
     constructor() {
         super('boot-game')
@@ -42,10 +42,10 @@ export default class BootGameScene extends Phaser.Scene {
         this.player.setCollideWorldBounds(true)
         this.physics.add.collider(this.player, this.platforms)
 
-        // key controls
+        // player key controls
         this.cursor = this.input.keyboard.createCursorKeys()
 
-        // animations
+        // player animations
         this.anims.create({
             key: 'playerTurnLeft',
             frames: this.anims.generateFrameNumbers('dude', {
@@ -74,6 +74,23 @@ export default class BootGameScene extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         })
+
+        // stars
+        this.stars = this.physics.add.group({
+            key: 'star',
+            repeat: 11,
+            setXY: { x: 12, y: 0, stepX: 70 }
+        })
+
+        this.physics.add.collider(this.stars, this.platforms)
+        this.stars.children.iterate(child => {
+            // cast type
+            const star = child as Phaser.Physics.Arcade.Image
+            star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
+        }
+
+        )
+
     }
 
     // loop
@@ -81,10 +98,10 @@ export default class BootGameScene extends Phaser.Scene {
         // events
         if (this.cursor?.left?.isDown) {
             this.player?.setVelocityX(-160)
-            this.player?.anims.play('playerTurnLeft',true)
+            this.player?.anims.play('playerTurnLeft', true)
         } else if (this.cursor?.right?.isDown) {
             this.player?.setVelocityX(160)
-            this.player?.anims.play('playerTurnRight',true)
+            this.player?.anims.play('playerTurnRight', true)
         } else {
             this.player?.setVelocityX(0)
             this.player?.anims.play('playerTurn')
