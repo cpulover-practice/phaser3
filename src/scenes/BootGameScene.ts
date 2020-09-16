@@ -82,15 +82,21 @@ export default class BootGameScene extends Phaser.Scene {
             setXY: { x: 12, y: 0, stepX: 70 }
         })
 
-        this.physics.add.collider(this.stars, this.platforms)
         this.stars.children.iterate(child => {
             // cast type
             const star = child as Phaser.Physics.Arcade.Image
             star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
         }
-
         )
+        this.physics.add.collider(this.stars, this.platforms)
+        this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
+    }
 
+    private collectStar(player: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
+        // cast type
+        const star = theStar as Phaser.Physics.Arcade.Image
+        // hide the collected star
+        star.disableBody(true, true)
     }
 
     // loop
