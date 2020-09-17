@@ -13,8 +13,7 @@ export default class BootGameScene extends Phaser.Scene {
         super('boot-game')
     }
 
-    // load assets: images, audio, etc.
-    preload() {
+    preload() { // load assets: images, audio, etc.
         // static images
         this.load.image('sky', 'assets/sky.png')
         this.load.image('platform', 'assets/platform.png')
@@ -27,36 +26,42 @@ export default class BootGameScene extends Phaser.Scene {
         })
     }
 
-    // add objects to the scene (init and draw)
-    create() {
-        this.add.image(0, 0, 'sky').setOrigin(0, 0) // reset the drawing position of the image to the top-left        
+    create() { // create objects to the scene (init and draw)
+        this.createCommonComponents()
+        this.createPlatforms()
+        this.createPlayer()
+        this.createPlayerAnimations()
+        this.createStars()
+        this.createBombs()
 
+        this.setupCollisions()
+    }
+
+    private createCommonComponents() {
+        // background
+        this.add.image(0, 0, 'sky').setOrigin(0, 0) // reset the drawing position of the image to the top-left        
         // score text
         this.scoreText = this.add.text(16, 16, "Score: 0", { fontSize: '32px', fill: 'black' })
-
-        // platforms
-        this.platforms = this.physics.add.staticGroup()
-        const ground = this.platforms.create(400, 568, 'platform') as Phaser.Physics.Arcade.Image
-        ground.setScale(2).refreshBody()
-        this.platforms.create(600, 400, 'platform')
-        this.platforms.create(50, 250, 'platform')
-        this.platforms.create(750, 220, 'platform')
-
-        // player
-        this.player = this.physics.add.sprite(100, 450, 'dude')
-        this.player.setBounce(0.3)
-        this.player.setCollideWorldBounds(true)
-        this.physics.add.collider(this.player, this.platforms)
-
-        this.bombs = this.physics.add.group()
-        this.physics.add.collider(this.platforms, this.bombs)
-        this.physics.add.collider(this.bombs, this.bombs) // add collider between bombs
-        this.physics.add.collider(this.player, this.bombs, this.hitBomb, undefined, this)
-
         // player key controls
         this.cursor = this.input.keyboard.createCursorKeys()
+    }
 
-        // player animations
+    private createStars() {
+        this.stars = this.physics.add.group({
+            key: 'star',
+            repeat: 11,
+            setXY: { x: 12, y: 0, stepX: 70 }
+        })
+
+        this.stars.children.iterate(child => {
+            // cast type
+            const star = child as Phaser.Physics.Arcade.Image
+            star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
+        }
+        )
+    }
+
+    private createPlayerAnimations() {
         this.anims.create({
             key: 'playerTurnLeft',
             frames: this.anims.generateFrameNumbers('dude', {
@@ -85,25 +90,40 @@ export default class BootGameScene extends Phaser.Scene {
             frameRate: 10,
             repeat: -1
         })
-
-        // stars
-        this.stars = this.physics.add.group({
-            key: 'star',
-            repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 }
-        })
-
-        this.stars.children.iterate(child => {
-            // cast type
-            const star = child as Phaser.Physics.Arcade.Image
-            star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
-        }
-        )
-        this.physics.add.collider(this.stars, this.platforms)
-        this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
     }
 
-    // overlapping/collision handlers
+    private createBombs() {
+        this.bombs = this.physics.add.group()
+    }
+
+    private createPlayer() {
+        this.player = this.physics.add.sprite(100, 450, 'dude')
+        this.player.setBounce(0.3)
+        this.player.setCollideWorldBounds(true)
+    }
+
+    private createPlatforms() {
+        this.platforms = this.physics.add.staticGroup()
+        const ground = this.platforms.create(400, 568, 'platform') as Phaser.Physics.Arcade.Image
+        ground.setScale(2).refreshBody()
+        this.platforms.create(600, 400, 'platform')
+        this.platforms.create(50, 250, 'platform')
+        this.platforms.create(750, 220, 'platform')
+    }
+
+    // OVERLAPING-COLLISION
+    private setupCollisions() {
+        if (this.player && this.platforms && this.bombs && this.stars) {
+            this.physics.add.collider(this.player, this.platforms)
+            this.physics.add.collider(this.stars, this.platforms)
+            this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
+            this.physics.add.collider(this.platforms, this.bombs)
+            this.physics.add.collider(this.bombs, this.bombs) // add collider between bombs
+            this.physics.add.collider(this.player, this.bombs, this.hitBomb, undefined, this)
+        }
+    }
+
+    // OVERLAPPING-COLLISION HANDLES
     private collectStar(thePlayer: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
         // cast type
         const star = theStar as Phaser.Physics.Arcade.Image
