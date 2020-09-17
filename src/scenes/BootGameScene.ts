@@ -1,4 +1,5 @@
 import Phaser from 'phaser'
+import ScoreLabel from '../elements/ScoreLabel'
 
 // KEY IDENTIFIERS
 // for scene
@@ -18,8 +19,7 @@ export default class BootGameScene extends Phaser.Scene {
     private player?: Phaser.Physics.Arcade.Sprite
     private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
     private stars?: Phaser.Physics.Arcade.Group
-    private score: integer = 0
-    private scoreText?: Phaser.GameObjects.Text
+    private scoreLabel?: ScoreLabel
     private bombs?: Phaser.Physics.Arcade.Group
 
     constructor() {
@@ -53,9 +53,15 @@ export default class BootGameScene extends Phaser.Scene {
         // background
         this.add.image(0, 0, SKY_KEY).setOrigin(0, 0) // reset the drawing position of the image to the top-left        
         // score text
-        this.scoreText = this.add.text(16, 16, "Score: 0", { fontSize: '32px', fill: 'black' })
+        this.scoreLabel = this.createScoreLabel()
         // player key controls
         this.cursor = this.input.keyboard.createCursorKeys()
+    }
+
+    private createScoreLabel() {
+        const scoreLabel: ScoreLabel = new ScoreLabel(this, 0)
+        this.add.existing(scoreLabel)
+        return scoreLabel
     }
 
     private createStars() {
@@ -147,8 +153,9 @@ export default class BootGameScene extends Phaser.Scene {
         // hide the collected star
         star.disableBody(true, true)
         // update score
-        this.score += 10
-        this.scoreText?.setText(`Score: ${this.score}`)
+        if (this.scoreLabel) {
+            this.scoreLabel.addScore(10)
+        }
 
         // count number of active stars (not collected)
         if (this.stars?.countActive(true) === 0) {
