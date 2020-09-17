@@ -7,7 +7,7 @@
       doSomething(this.player.x)
   }
   ```
-  - Scene structure:
-    - ```preload()```: load assets: images, audio, etc.
-    - ```create()```: add game objects to the scene (init + draw)
-    - ```update()```: loop (collisions, events, animations)
+- Scene structure:
+  - ```preload()```: load assets: images, audio, etc.
+  - ```create()```: add game objects to the scene (init + draw)
+  - ```update()```: loop (collisions, events, animations)

@@ -23,6 +23,8 @@ export default class BootGameScene extends Phaser.Scene {
     private scoreLabel?: ScoreLabel
     private bombSpawner?: BombSpawner
 
+    private gameOver=false
+
     constructor() {
         super(LEVEL1_KEY)
     }
@@ -169,6 +171,7 @@ export default class BootGameScene extends Phaser.Scene {
         this.physics.pause()
         this.player?.setTint(0xff0000)
         this.player?.anims.play(ANI_PLAYER_FRONT_KEY)
+        this.gameOver=true
     }
     /* END OF OVERLAPING-COLLISION */
 
@@ -189,6 +192,10 @@ export default class BootGameScene extends Phaser.Scene {
         // jump
         if (this.cursor?.up?.isDown && this.player?.body.touching.down) {
             this.player.setVelocityY(-330)
+        }
+
+        if(this.gameOver){
+            return
         }
     }
 }
