@@ -7,6 +7,7 @@ export default class BootGameScene extends Phaser.Scene {
     private stars?: Phaser.Physics.Arcade.Group
     private score: integer = 0
     private scoreText?: Phaser.GameObjects.Text
+    private bombs?: Phaser.Physics.Arcade.Group
 
     constructor() {
         super('boot-game')
@@ -46,6 +47,11 @@ export default class BootGameScene extends Phaser.Scene {
         this.player.setBounce(0.3)
         this.player.setCollideWorldBounds(true)
         this.physics.add.collider(this.player, this.platforms)
+
+        this.bombs = this.physics.add.group()
+        this.physics.add.collider(this.platforms, this.bombs)
+        this.physics.add.collider(this.bombs, this.bombs) // add collider between bombs
+        this.physics.add.collider(this.player, this.bombs, this.hitBomb, undefined, this)
 
         // player key controls
         this.cursor = this.input.keyboard.createCursorKeys()
@@ -97,8 +103,8 @@ export default class BootGameScene extends Phaser.Scene {
         this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
     }
 
-    // overlapping handlers
-    private collectStar(player: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
+    // overlapping/collision handlers
+    private collectStar(thePlayer: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
         // cast type
         const star = theStar as Phaser.Physics.Arcade.Image
         // hide the collected star
@@ -106,6 +112,35 @@ export default class BootGameScene extends Phaser.Scene {
         // update score
         this.score += 10
         this.scoreText?.setText(`Score: ${this.score}`)
+
+        // count number of active stars (not collected)
+        if (this.stars?.countActive(true) === 0) {
+            // re-active all the stars
+            this.stars.children.iterate(child => {
+                // cast type
+                const star = child as Phaser.Physics.Arcade.Image
+                star.enableBody(true, star.x, 0, true, true)
+            })
+
+            if (this.player) { // check optinal attribute object availability before access its attributes (player.x, player.y,...)
+                // set bom X-position away from player X-position
+                const bombX = (this.player.x > 400)
+                    ? Phaser.Math.Between(0, 300)
+                    : Phaser.Math.Between(500, 800)
+
+                // generate new bomb
+                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(bombX, 0, 'bomb')
+                bomb.setCollideWorldBounds(true)
+                bomb.setBounce(1)
+                bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
+            }
+        }
+    }
+
+    private hitBomb(thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject) {
+        this.physics.pause()
+        this.player?.setTint(0xff0000)
+        this.player?.anims.play('playerTurn')
     }
 
     // loop
