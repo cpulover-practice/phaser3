@@ -1,5 +1,18 @@
 import Phaser from 'phaser'
 
+// KEY IDENTIFIERS
+// for scene
+const LEVEL1_KEY = 'level1'
+// for assets
+const SKY_KEY = 'sky'
+const PLATFORM_KEY = 'platform'
+const STAR_KEY = 'star'
+const BOMB_KEY = 'bomb'
+// for animations
+const ANI_PLAYER_FRONT_KEY = 'playerFront'
+const ANI_PLAYER_TO_LEFT_KEY = 'playerToLeft'
+const ANI_PLAYER_TO_RIGHT_KEY = 'playerToRight'
+
 export default class BootGameScene extends Phaser.Scene {
     private platforms?: Phaser.Physics.Arcade.StaticGroup // "?" means attribute could be undefined
     private player?: Phaser.Physics.Arcade.Sprite
@@ -10,15 +23,15 @@ export default class BootGameScene extends Phaser.Scene {
     private bombs?: Phaser.Physics.Arcade.Group
 
     constructor() {
-        super('boot-game')
+        super(LEVEL1_KEY)
     }
 
     preload() { // load assets: images, audio, etc.
         // static images
-        this.load.image('sky', 'assets/sky.png')
-        this.load.image('platform', 'assets/platform.png')
-        this.load.image('star', 'assets/star.png')
-        this.load.image('bomb', 'assets/bomb.png')
+        this.load.image(SKY_KEY, 'assets/sky.png')
+        this.load.image(PLATFORM_KEY, 'assets/platform.png')
+        this.load.image(STAR_KEY, 'assets/star.png')
+        this.load.image(BOMB_KEY, 'assets/bomb.png')
         // sprite for animation
         this.load.spritesheet('dude', 'assets/dude.png', {
             frameWidth: 32,
@@ -39,7 +52,7 @@ export default class BootGameScene extends Phaser.Scene {
 
     private createCommonComponents() {
         // background
-        this.add.image(0, 0, 'sky').setOrigin(0, 0) // reset the drawing position of the image to the top-left        
+        this.add.image(0, 0, SKY_KEY).setOrigin(0, 0) // reset the drawing position of the image to the top-left        
         // score text
         this.scoreText = this.add.text(16, 16, "Score: 0", { fontSize: '32px', fill: 'black' })
         // player key controls
@@ -48,7 +61,7 @@ export default class BootGameScene extends Phaser.Scene {
 
     private createStars() {
         this.stars = this.physics.add.group({
-            key: 'star',
+            key: STAR_KEY,
             repeat: 11,
             setXY: { x: 12, y: 0, stepX: 70 }
         })
@@ -63,7 +76,7 @@ export default class BootGameScene extends Phaser.Scene {
 
     private createPlayerAnimations() {
         this.anims.create({
-            key: 'playerTurnLeft',
+            key: ANI_PLAYER_TO_LEFT_KEY,
             frames: this.anims.generateFrameNumbers('dude', {
                 start: 0,
                 end: 3
@@ -73,7 +86,7 @@ export default class BootGameScene extends Phaser.Scene {
         })
 
         this.anims.create({
-            key: 'playerTurn',
+            key: ANI_PLAYER_FRONT_KEY,
             frames: [{
                 key: 'dude',
                 frame: 4
@@ -82,7 +95,7 @@ export default class BootGameScene extends Phaser.Scene {
         })
 
         this.anims.create({
-            key: 'playerTurnRight',
+            key: ANI_PLAYER_TO_RIGHT_KEY,
             frames: this.anims.generateFrameNumbers('dude', {
                 start: 5,
                 end: 8
@@ -104,11 +117,11 @@ export default class BootGameScene extends Phaser.Scene {
 
     private createPlatforms() {
         this.platforms = this.physics.add.staticGroup()
-        const ground = this.platforms.create(400, 568, 'platform') as Phaser.Physics.Arcade.Image
+        const ground = this.platforms.create(400, 568, PLATFORM_KEY) as Phaser.Physics.Arcade.Image
         ground.setScale(2).refreshBody()
-        this.platforms.create(600, 400, 'platform')
-        this.platforms.create(50, 250, 'platform')
-        this.platforms.create(750, 220, 'platform')
+        this.platforms.create(600, 400, PLATFORM_KEY)
+        this.platforms.create(50, 250, PLATFORM_KEY)
+        this.platforms.create(750, 220, PLATFORM_KEY)
     }
 
     // OVERLAPING-COLLISION
@@ -149,7 +162,7 @@ export default class BootGameScene extends Phaser.Scene {
                     : Phaser.Math.Between(500, 800)
 
                 // generate new bomb
-                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(bombX, 0, 'bomb')
+                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(bombX, 0, BOMB_KEY)
                 bomb.setCollideWorldBounds(true)
                 bomb.setBounce(1)
                 bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
@@ -160,7 +173,7 @@ export default class BootGameScene extends Phaser.Scene {
     private hitBomb(thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject) {
         this.physics.pause()
         this.player?.setTint(0xff0000)
-        this.player?.anims.play('playerTurn')
+        this.player?.anims.play(ANI_PLAYER_FRONT_KEY)
     }
 
     // loop
@@ -168,13 +181,13 @@ export default class BootGameScene extends Phaser.Scene {
         // events
         if (this.cursor?.left?.isDown) {
             this.player?.setVelocityX(-160)
-            this.player?.anims.play('playerTurnLeft', true)
+            this.player?.anims.play(ANI_PLAYER_TO_LEFT_KEY, true)
         } else if (this.cursor?.right?.isDown) {
             this.player?.setVelocityX(160)
-            this.player?.anims.play('playerTurnRight', true)
+            this.player?.anims.play(ANI_PLAYER_TO_RIGHT_KEY, true)
         } else {
             this.player?.setVelocityX(0)
-            this.player?.anims.play('playerTurn')
+            this.player?.anims.play(ANI_PLAYER_FRONT_KEY)
         }
         // jump
         if (this.cursor?.up?.isDown && this.player?.body.touching.down) {
