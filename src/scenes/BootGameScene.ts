@@ -1,5 +1,6 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../elements/ScoreLabel'
+import BombSpawner from '../elements/BombSpawner'
 
 // KEY IDENTIFIERS
 // for scene
@@ -20,7 +21,7 @@ export default class BootGameScene extends Phaser.Scene {
     private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
     private stars?: Phaser.Physics.Arcade.Group
     private scoreLabel?: ScoreLabel
-    private bombs?: Phaser.Physics.Arcade.Group
+    private bombSpawner?: BombSpawner
 
     constructor() {
         super(LEVEL1_KEY)
@@ -44,7 +45,7 @@ export default class BootGameScene extends Phaser.Scene {
         this.platforms = this.createPlatforms()
         this.player = this.createPlayer()
         this.stars = this.createStars()
-        this.bombs = this.createBombs()
+        this.bombSpawner = new BombSpawner(this, BOMB_KEY)
 
         this.setupCollisions()
     }
@@ -67,8 +68,8 @@ export default class BootGameScene extends Phaser.Scene {
     private createStars() {
         const stars = this.physics.add.group({
             key: STAR_KEY,
-            repeat: 11,
-            setXY: { x: 12, y: 0, stepX: 70 }
+            repeat: 1,
+            setXY: { x: 12, y: 0, stepX: 500 }
         })
 
         stars.children.iterate(child => {
@@ -111,14 +112,9 @@ export default class BootGameScene extends Phaser.Scene {
         })
     }
 
-    private createBombs() {
-        const bombs = this.physics.add.group()
-        return bombs
-    }
-
     private createPlayer() {
         const player = this.physics.add.sprite(100, 450, 'dude')
-        player.setBounce(0.3)
+        player.setBounce(0.2)
         player.setCollideWorldBounds(true)
         this.setupPlayerAnimations()
         return player
@@ -134,19 +130,18 @@ export default class BootGameScene extends Phaser.Scene {
         return platforms
     }
 
-    // OVERLAPING-COLLISION
+    /* OVERLAPING-COLLISION */
     private setupCollisions() {
-        if (this.player && this.platforms && this.bombs && this.stars) {
+        if (this.player && this.platforms && this.bombSpawner?.group && this.stars) {
             this.physics.add.collider(this.player, this.platforms)
             this.physics.add.collider(this.stars, this.platforms)
             this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
-            this.physics.add.collider(this.platforms, this.bombs)
-            this.physics.add.collider(this.bombs, this.bombs) // add collider between bombs
-            this.physics.add.collider(this.player, this.bombs, this.hitBomb, undefined, this)
+            this.physics.add.collider(this.platforms, this.bombSpawner.group)
+            this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group) // add collider between bombs
+            this.physics.add.collider(this.player, this.bombSpawner.group, this.hitBomb, undefined, this)
         }
     }
 
-    // OVERLAPPING-COLLISION HANDLES
     private collectStar(thePlayer: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
         // cast type
         const star = theStar as Phaser.Physics.Arcade.Image
@@ -154,7 +149,7 @@ export default class BootGameScene extends Phaser.Scene {
         star.disableBody(true, true)
         // update score
         if (this.scoreLabel) {
-            this.scoreLabel.addScore(10)
+            this.scoreLabel.addScore(1)
         }
 
         // count number of active stars (not collected)
@@ -165,19 +160,8 @@ export default class BootGameScene extends Phaser.Scene {
                 const star = child as Phaser.Physics.Arcade.Image
                 star.enableBody(true, star.x, 0, true, true)
             })
-
-            if (this.player) { // check optinal attribute object availability before access its attributes (player.x, player.y,...)
-                // set bom X-position away from player X-position
-                const bombX = (this.player.x > 400)
-                    ? Phaser.Math.Between(0, 300)
-                    : Phaser.Math.Between(500, 800)
-
-                // generate new bomb
-                const bomb: Phaser.Physics.Arcade.Image = this.bombs?.create(bombX, 0, BOMB_KEY)
-                bomb.setCollideWorldBounds(true)
-                bomb.setBounce(1)
-                bomb.setVelocity(Phaser.Math.Between(-200, 200), 20)
-            }
+            // generate new bomb
+            this.bombSpawner?.spawn(this.player?.x)
         }
     }
 
@@ -186,6 +170,8 @@ export default class BootGameScene extends Phaser.Scene {
         this.player?.setTint(0xff0000)
         this.player?.anims.play(ANI_PLAYER_FRONT_KEY)
     }
+    /* END OF OVERLAPING-COLLISION */
+
 
     // loop
     update() {
