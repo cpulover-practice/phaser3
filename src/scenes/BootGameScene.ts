@@ -41,11 +41,10 @@ export default class BootGameScene extends Phaser.Scene {
 
     create() { // create objects to the scene (init and draw)
         this.createCommonComponents()
-        this.createPlatforms()
-        this.createPlayer()
-        this.createPlayerAnimations()
-        this.createStars()
-        this.createBombs()
+        this.platforms = this.createPlatforms()
+        this.player = this.createPlayer()
+        this.stars = this.createStars()
+        this.bombs = this.createBombs()
 
         this.setupCollisions()
     }
@@ -60,21 +59,22 @@ export default class BootGameScene extends Phaser.Scene {
     }
 
     private createStars() {
-        this.stars = this.physics.add.group({
+        const stars = this.physics.add.group({
             key: STAR_KEY,
             repeat: 11,
             setXY: { x: 12, y: 0, stepX: 70 }
         })
 
-        this.stars.children.iterate(child => {
+        stars.children.iterate(child => {
             // cast type
             const star = child as Phaser.Physics.Arcade.Image
             star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
         }
         )
+        return stars
     }
 
-    private createPlayerAnimations() {
+    private setupPlayerAnimations() {
         this.anims.create({
             key: ANI_PLAYER_TO_LEFT_KEY,
             frames: this.anims.generateFrameNumbers('dude', {
@@ -106,22 +106,26 @@ export default class BootGameScene extends Phaser.Scene {
     }
 
     private createBombs() {
-        this.bombs = this.physics.add.group()
+        const bombs = this.physics.add.group()
+        return bombs
     }
 
     private createPlayer() {
-        this.player = this.physics.add.sprite(100, 450, 'dude')
-        this.player.setBounce(0.3)
-        this.player.setCollideWorldBounds(true)
+        const player = this.physics.add.sprite(100, 450, 'dude')
+        player.setBounce(0.3)
+        player.setCollideWorldBounds(true)
+        this.setupPlayerAnimations()
+        return player
     }
 
     private createPlatforms() {
-        this.platforms = this.physics.add.staticGroup()
-        const ground = this.platforms.create(400, 568, PLATFORM_KEY) as Phaser.Physics.Arcade.Image
+        const platforms = this.physics.add.staticGroup()
+        const ground = platforms.create(400, 568, PLATFORM_KEY) as Phaser.Physics.Arcade.Image
         ground.setScale(2).refreshBody()
-        this.platforms.create(600, 400, PLATFORM_KEY)
-        this.platforms.create(50, 250, PLATFORM_KEY)
-        this.platforms.create(750, 220, PLATFORM_KEY)
+        platforms.create(600, 400, PLATFORM_KEY)
+        platforms.create(50, 250, PLATFORM_KEY)
+        platforms.create(750, 220, PLATFORM_KEY)
+        return platforms
     }
 
     // OVERLAPING-COLLISION
