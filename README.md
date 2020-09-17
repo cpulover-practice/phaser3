@@ -1,5 +1,6 @@
 - Install node modules: ```npm install```
 - Run local server: ```npm run start```
+- Static resource in ```/public/assets```
 - Declare optional-undefined attribute (attribute can be undefined) with ```?```: ```private player?: Phaser.Physics.Arcade.Sprite```
 - Check object availability before access its optional-undefined attributes
   ```

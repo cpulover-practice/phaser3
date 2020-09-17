@@ -1,6 +1,7 @@
 import Phaser from 'phaser'
 import ScoreLabel from '../elements/ScoreLabel'
 import BombSpawner from '../elements/BombSpawner'
+import StarSpawner from '../elements/StarSpawner'
 
 // KEY IDENTIFIERS
 // for scene
@@ -19,8 +20,8 @@ export default class BootGameScene extends Phaser.Scene {
     private platforms?: Phaser.Physics.Arcade.StaticGroup // "?" means attribute could be undefined
     private player?: Phaser.Physics.Arcade.Sprite
     private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
-    private stars?: Phaser.Physics.Arcade.Group
     private scoreLabel?: ScoreLabel
+    private starSpawner?: StarSpawner
     private bombSpawner?: BombSpawner
 
     private gameOver=false
@@ -46,7 +47,8 @@ export default class BootGameScene extends Phaser.Scene {
         this.createCommonComponents()
         this.platforms = this.createPlatforms()
         this.player = this.createPlayer()
-        this.stars = this.createStars()
+        this.starSpawner = new StarSpawner(this, STAR_KEY)
+        this.starSpawner.spawnMany()
         this.bombSpawner = new BombSpawner(this, BOMB_KEY)
 
         this.setupCollisions()
@@ -65,22 +67,6 @@ export default class BootGameScene extends Phaser.Scene {
         const scoreLabel: ScoreLabel = new ScoreLabel(this, 0)
         this.add.existing(scoreLabel)
         return scoreLabel
-    }
-
-    private createStars() {
-        const stars = this.physics.add.group({
-            key: STAR_KEY,
-            repeat: 1,
-            setXY: { x: 12, y: 0, stepX: 500 }
-        })
-
-        stars.children.iterate(child => {
-            // cast type
-            const star = child as Phaser.Physics.Arcade.Image
-            star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
-        }
-        )
-        return stars
     }
 
     private setupPlayerAnimations() {
@@ -134,10 +120,10 @@ export default class BootGameScene extends Phaser.Scene {
 
     /* OVERLAPING-COLLISION */
     private setupCollisions() {
-        if (this.player && this.platforms && this.bombSpawner?.group && this.stars) {
+        if (this.player && this.platforms && this.bombSpawner?.group && this.starSpawner?.group) {
             this.physics.add.collider(this.player, this.platforms)
-            this.physics.add.collider(this.stars, this.platforms)
-            this.physics.add.overlap(this.stars, this.player, this.collectStar, undefined, this)
+            this.physics.add.collider(this.starSpawner.group, this.platforms)
+            this.physics.add.overlap(this.starSpawner.group, this.player, this.collectStar, undefined, this)
             this.physics.add.collider(this.platforms, this.bombSpawner.group)
             this.physics.add.collider(this.bombSpawner.group, this.bombSpawner.group) // add collider between bombs
             this.physics.add.collider(this.player, this.bombSpawner.group, this.hitBomb, undefined, this)
@@ -155,16 +141,17 @@ export default class BootGameScene extends Phaser.Scene {
         }
 
         // count number of active stars (not collected)
-        if (this.stars?.countActive(true) === 0) {
+        if (this.starSpawner?.group){
+        if (this.starSpawner.group.countActive(true) === 0) {
             // re-active all the stars
-            this.stars.children.iterate(child => {
+            this.starSpawner.group.children.iterate(child => {
                 // cast type
                 const star = child as Phaser.Physics.Arcade.Image
                 star.enableBody(true, star.x, 0, true, true)
             })
             // generate new bomb
             this.bombSpawner?.spawn(this.player?.x)
-        }
+        }}
     }
 
     private hitBomb(thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject) {

@@ -1,9 +1,7 @@
-import Phaser from 'phaser'
-
 export default class BombSpawner {
     private _scene?: Phaser.Scene
     private _group?: Phaser.Physics.Arcade.Group // for moving elements
-    private _key?: string // idetify key for asset
+    private _key?: string // identify key for asset
 
     constructor(scence: Phaser.Scene, key: string = 'bomb') { // assign defaut value in case undefined param
         this._scene = scence
