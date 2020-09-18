@@ -7,7 +7,7 @@ import StarSpawner from '../elements/StarSpawner'
 import { TEXTURE } from '../constants/TEXTURE'
 import { SCENE } from '../constants/SCENE'
 
-export default class BootGameScene extends Phaser.Scene {
+export default class PlayGameScene extends Phaser.Scene {
     private platforms?: Phaser.Physics.Arcade.StaticGroup // "?" means attribute could be undefined
     private player?: Player
     private scoreLabel?: ScoreLabel
@@ -20,7 +20,7 @@ export default class BootGameScene extends Phaser.Scene {
         super(SCENE.LEVEL1)
     }
 
-    preload() { // load assets: images, audio, etc.
+    preload() {
         // static images
         this.load.image(TEXTURE.SKY, 'assets/sky.png')
         this.load.image(TEXTURE.PLATFORM, 'assets/platform.png')
@@ -33,7 +33,7 @@ export default class BootGameScene extends Phaser.Scene {
         })
     }
 
-    create() { // create objects to the scene (init and draw)
+    create() {
         // background
         this.add.image(0, 0, TEXTURE.SKY).setOrigin(0, 0) // reset the drawing position of the image to the top-left        
         this.scoreLabel = new ScoreLabel(this, 0)
@@ -102,7 +102,6 @@ export default class BootGameScene extends Phaser.Scene {
     }
     /* END OF OVERLAPING-COLLISION */
 
-    // loop
     update() {
         this.player?.control()
 
