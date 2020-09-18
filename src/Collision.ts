@@ -1,10 +1,9 @@
 import PlayGameScene from './scenes/PlayGameScene';
+import { ANIM } from './constants/KEY'
 
 export default class Collision {
-    // private static _scene?: PlayGameScene
 
     static setup(scene: PlayGameScene) {
-        // this._scene = scene
         if (scene.player && scene.platforms && scene.bombSpawner?.group && scene.starSpawner?.group) {
             scene.physics.add.collider(scene.player, scene.platforms)
             scene.physics.add.collider(scene.starSpawner.group, scene.platforms)
@@ -48,7 +47,7 @@ export default class Collision {
     static playerHitsBomb(thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject, scene: PlayGameScene) {
         scene.physics.pause()
         scene.player?.setTint(0xff0000)
-        // this.player?.anims.play(ANI_PLAYER_FRONT_KEY)
+        scene.player?.anims.play(ANIM.PLAYER_FRONT)
         scene.gameOver = true
     }
 }
