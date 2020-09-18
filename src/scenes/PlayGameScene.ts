@@ -4,8 +4,8 @@ import ScoreLabel from '../elements/ScoreLabel'
 import BombSpawner from '../elements/BombSpawner'
 import StarSpawner from '../elements/StarSpawner'
 
-import { TEXTURE } from '../constants/TEXTURE'
-import { SCENE } from '../constants/SCENE'
+import { TEXTURE } from '../constants/KEY'
+import { SCENE } from '../constants/KEY'
 import Collision from '~/Collision'
 
 export default class PlayGameScene extends Phaser.Scene {
@@ -14,7 +14,6 @@ export default class PlayGameScene extends Phaser.Scene {
     private _scoreLabel?: ScoreLabel
     private _starSpawner?: StarSpawner
     private _bombSpawner?: BombSpawner
-
     private _gameOver = false
 
     constructor() {

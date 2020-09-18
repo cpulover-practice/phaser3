@@ -1,5 +1,5 @@
 import { GAME } from '../constants/GAME'
-import { BOMB } from '../constants/BOMB'
+import { BOMB } from '../constants/ELEMENT'
 
 export default class BombSpawner {
     private _scene?: Phaser.Scene

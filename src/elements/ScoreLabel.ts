@@ -1,4 +1,4 @@
-import { SCORE_LABEL } from '../constants/SCORE_LABEL'
+import { SCORE_LABEL } from '../constants/ELEMENT'
 
 import Phaser from 'phaser'
 

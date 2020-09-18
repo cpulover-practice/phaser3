@@ -1,6 +1,6 @@
 import Phaser from 'phaser'
-import { ANIM } from '../constants/ANIM'
-import { PLAYER } from '../constants/PLAYER'
+import { ANIM } from '../constants/KEY'
+import { PLAYER } from '../constants/ELEMENT'
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private _scene?: Phaser.Scene

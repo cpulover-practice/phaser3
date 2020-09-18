@@ -1,9 +1,9 @@
-import {STAR} from '../constants/STAR'
+import { STAR } from '../constants/ELEMENT'
 
 export default class StarSpawner {
     private _scene?: Phaser.Scene
     private _group?: Phaser.Physics.Arcade.Group // for moving elements
-    private _texture?: string 
+    private _texture?: string
 
     constructor(scence: Phaser.Scene, texture: string = 'star') { // assign defaut value in case undefined param
         this._scene = scence
@@ -11,7 +11,7 @@ export default class StarSpawner {
         this._group = scence.physics.add.group()
     }
 
-    get scene(){
+    get scene() {
         return this._scene
     }
 
@@ -19,7 +19,7 @@ export default class StarSpawner {
         return this._group
     }
 
-    get texture(){
+    get texture() {
         return this._texture
     }
 

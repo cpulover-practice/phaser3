@@ -14,17 +14,17 @@ export default class Collision {
             scene.physics.add.overlap(scene.player, scene.starSpawner.group,
                 // wrap another function inside callback to pass scene param 
                 function (thePlayer: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject) {
-                    Collision.playerCollectStar(thePlayer, theStar, scene)
+                    Collision.playerCollectsStar(thePlayer, theStar, scene)
                 }, undefined, scene)
 
             scene.physics.add.collider(scene.player, scene.bombSpawner.group,
                 function (thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject) {
-                    Collision.playerHitBomb(thePlayer, theBomb, scene)
+                    Collision.playerHitsBomb(thePlayer, theBomb, scene)
                 }, undefined, scene)
         }
     }
 
-    static playerCollectStar(thePlayer: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject, scene: PlayGameScene) {
+    static playerCollectsStar(thePlayer: Phaser.GameObjects.GameObject, theStar: Phaser.GameObjects.GameObject, scene: PlayGameScene) {
         // cast type
         const star = theStar as Phaser.Physics.Arcade.Image
         // hide the collected star
@@ -45,7 +45,7 @@ export default class Collision {
         }
     }
 
-    static playerHitBomb(thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject, scene: PlayGameScene) {
+    static playerHitsBomb(thePlayer: Phaser.GameObjects.GameObject, theBomb: Phaser.GameObjects.GameObject, scene: PlayGameScene) {
         scene.physics.pause()
         scene.player?.setTint(0xff0000)
         // this.player?.anims.play(ANI_PLAYER_FRONT_KEY)
