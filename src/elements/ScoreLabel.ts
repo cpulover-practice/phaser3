@@ -10,6 +10,8 @@ export default class ScoreLabel extends Phaser.GameObjects.Text {
     constructor(scene: Phaser.Scene, score: integer) {
         super(scene, LABEL_X, LABEL_Y, formatScore(score), LABEL_STYLE)
         this.score = score
+
+        scene.add.existing(this)
     }
 
     addScore(score: integer) {

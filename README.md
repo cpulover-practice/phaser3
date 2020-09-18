@@ -10,5 +10,5 @@
   ```
 - Scene structure:
   - ```preload()```: load assets: images, audio, etc.
-  - ```create()```: add game objects to the scene (init + draw)
-  - ```update()```: loop (collisions, events, animations)
+  - ```create()```: add game objects to the scene (init + draw + collision)
+  - ```update()```: loop (events, control, animations, game over)
