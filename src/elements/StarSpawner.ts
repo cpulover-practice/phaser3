@@ -1,11 +1,13 @@
+import {STAR} from '../constants/STAR'
+
 export default class StarSpawner {
     private _scene?: Phaser.Scene
     private _group?: Phaser.Physics.Arcade.Group // for moving elements
-    private _key?: string // identify key for asset
+    private _texture?: string 
 
-    constructor(scence: Phaser.Scene, key: string = 'star') { // assign defaut value in case undefined param
+    constructor(scence: Phaser.Scene, texture: string = 'star') { // assign defaut value in case undefined param
         this._scene = scence
-        this._key = key
+        this._texture = texture
         this._group = scence.physics.add.group()
     }
 
@@ -17,21 +19,21 @@ export default class StarSpawner {
         return this._group
     }
 
-    get key(){
-        return this._key
+    get texture(){
+        return this._texture
     }
 
     spawnMany() {
         this.group?.createFromConfig({
-            key: this.key,
-            repeat: 1,
-            setXY: { x: 12, y: 0, stepX: 400 }
+            key: this.texture,
+            repeat: STAR.COUNT,
+            setXY: { x: STAR.START_X, y: STAR.START_Y, stepX: STAR.STEP_X }
         })
 
         this.group?.children.iterate(child => {
             // cast type
             const star = child as Phaser.Physics.Arcade.Image
-            star.setBounceY(Phaser.Math.FloatBetween(0.4, 0.8))
+            star.setBounceY(Phaser.Math.FloatBetween(STAR.BOUNCE_Y_MIN, STAR.BOUNCE_Y_MAX))
         }
         )
     }

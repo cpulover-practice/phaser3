@@ -1,57 +1,50 @@
 import Phaser from 'phaser'
-
-const PLAYER_X: integer = 50
-const PLAYER_Y: integer = 450
-const PLAYER_BOUNCE: integer = 0.2
-
-// for animations
-const ANI_PLAYER_FRONT_KEY = 'playerFront'
-const ANI_PLAYER_TO_LEFT_KEY = 'playerToLeft'
-const ANI_PLAYER_TO_RIGHT_KEY = 'playerToRight'
+import { ANIM } from '../constants/ANIM'
+import { PLAYER } from '../constants/PLAYER'
 
 export default class Player extends Phaser.Physics.Arcade.Sprite {
     private _scene?: Phaser.Scene
-    private _key?: string
+    private _texture?: string
     private cursor?: Phaser.Types.Input.Keyboard.CursorKeys
 
-    constructor(scene: Phaser.Scene, key: string = "player") {
-        super(scene, PLAYER_X, PLAYER_Y, key)
+    constructor(scene: Phaser.Scene, texture: string = "player") {
+        super(scene, PLAYER.START_X, PLAYER.START_Y, texture)
         this._scene = scene
-        this._key = key
-        
+        this._texture = texture
+
         scene.add.existing(this)
 
         // physic
         scene.physics.world.enable(this)
-        this.setBounce(PLAYER_BOUNCE)
+        this.setBounce(PLAYER.BOUNCE)
         this.setCollideWorldBounds(true)
         // control 
         this.cursor = scene.input.keyboard.createCursorKeys()
         // animations
-        this.createAnimations(key)
+        this.createAnimations(texture)
     }
 
     control() {
         if (this.cursor?.left?.isDown) {
-            this.setVelocityX(-160)
-            this.anims.play(ANI_PLAYER_TO_LEFT_KEY, true)
+            this.setVelocityX(-PLAYER.SPEED_X)
+            this.anims.play(ANIM.PLAYER_TO_LEFT, true)
         } else if (this.cursor?.right?.isDown) {
-            this.setVelocityX(160)
-            this.anims.play(ANI_PLAYER_TO_RIGHT_KEY, true)
+            this.setVelocityX(PLAYER.SPEED_X)
+            this.anims.play(ANIM.PLAYER_TO_RIGHT, true)
         } else {
             this.setVelocityX(0)
-            this.anims.play(ANI_PLAYER_FRONT_KEY)
+            this.anims.play(ANIM.PLAYER_FRONT)
         }
         // jump
         if (this.cursor?.up?.isDown && this.body.touching.down) {
-            this.setVelocityY(-330)
+            this.setVelocityY(-PLAYER.SPEED_Y)
         }
     }
 
-    createAnimations(key: string) {
+    createAnimations(playerTexture: string) {
         this._scene?.anims.create({
-            key: ANI_PLAYER_TO_LEFT_KEY,
-            frames: this._scene?.anims.generateFrameNumbers(key, {
+            key: ANIM.PLAYER_TO_LEFT,
+            frames: this._scene?.anims.generateFrameNumbers(playerTexture, {
                 start: 0,
                 end: 3
             }),
@@ -60,17 +53,17 @@ export default class Player extends Phaser.Physics.Arcade.Sprite {
         })
 
         this._scene?.anims.create({
-            key: ANI_PLAYER_FRONT_KEY,
+            key: ANIM.PLAYER_FRONT,
             frames: [{
-                key: key,
+                key: playerTexture,
                 frame: 4
             }],
             frameRate: 20
         })
 
         this._scene?.anims.create({
-            key: ANI_PLAYER_TO_RIGHT_KEY,
-            frames: this._scene?.anims.generateFrameNumbers(key, {
+            key: ANIM.PLAYER_TO_RIGHT,
+            frames: this._scene?.anims.generateFrameNumbers(playerTexture, {
                 start: 5,
                 end: 8
             }),

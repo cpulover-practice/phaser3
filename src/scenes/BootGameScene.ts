@@ -4,12 +4,8 @@ import ScoreLabel from '../elements/ScoreLabel'
 import BombSpawner from '../elements/BombSpawner'
 import StarSpawner from '../elements/StarSpawner'
 
-// key identifiers
-const SKY_KEY = 'sky'
-const PLATFORM_KEY = 'platform'
-const STAR_KEY = 'star'
-const BOMB_KEY = 'bomb'
-const PLAYER_KEY = 'dude'
+import { TEXTURE } from '../constants/TEXTURE'
+import { SCENE } from '../constants/SCENE'
 
 export default class BootGameScene extends Phaser.Scene {
     private platforms?: Phaser.Physics.Arcade.StaticGroup // "?" means attribute could be undefined
@@ -21,17 +17,17 @@ export default class BootGameScene extends Phaser.Scene {
     private gameOver = false
 
     constructor() {
-        super('level1')
+        super(SCENE.LEVEL1)
     }
 
     preload() { // load assets: images, audio, etc.
         // static images
-        this.load.image(SKY_KEY, 'assets/sky.png')
-        this.load.image(PLATFORM_KEY, 'assets/platform.png')
-        this.load.image(STAR_KEY, 'assets/star.png')
-        this.load.image(BOMB_KEY, 'assets/bomb.png')
+        this.load.image(TEXTURE.SKY, 'assets/sky.png')
+        this.load.image(TEXTURE.PLATFORM, 'assets/platform.png')
+        this.load.image(TEXTURE.STAR, 'assets/star.png')
+        this.load.image(TEXTURE.BOMB, 'assets/bomb.png')
         // sprite for animation
-        this.load.spritesheet(PLAYER_KEY, 'assets/dude.png', {
+        this.load.spritesheet(TEXTURE.PLAYER, 'assets/dude.png', {
             frameWidth: 32,
             frameHeight: 48
         })
@@ -39,11 +35,11 @@ export default class BootGameScene extends Phaser.Scene {
 
     create() { // create objects to the scene (init and draw)
         // background
-        this.add.image(0, 0, SKY_KEY).setOrigin(0, 0) // reset the drawing position of the image to the top-left        
+        this.add.image(0, 0, TEXTURE.SKY).setOrigin(0, 0) // reset the drawing position of the image to the top-left        
         this.scoreLabel = new ScoreLabel(this, 0)
-        this.player = new Player(this, PLAYER_KEY)
-        this.starSpawner = new StarSpawner(this, STAR_KEY)
-        this.bombSpawner = new BombSpawner(this, BOMB_KEY)
+        this.player = new Player(this, TEXTURE.PLAYER)
+        this.starSpawner = new StarSpawner(this, TEXTURE.STAR)
+        this.bombSpawner = new BombSpawner(this, TEXTURE.BOMB)
 
         this.platforms = this.createPlatforms()
         this.starSpawner.spawnMany()
@@ -53,11 +49,11 @@ export default class BootGameScene extends Phaser.Scene {
 
     private createPlatforms() {
         const platforms = this.physics.add.staticGroup()
-        const ground = platforms.create(400, 568, PLATFORM_KEY) as Phaser.Physics.Arcade.Image
+        const ground = platforms.create(400, 568, TEXTURE.PLATFORM) as Phaser.Physics.Arcade.Image
         ground.setScale(2).refreshBody()
-        platforms.create(600, 400, PLATFORM_KEY)
-        platforms.create(50, 250, PLATFORM_KEY)
-        platforms.create(750, 220, PLATFORM_KEY)
+        platforms.create(600, 400, TEXTURE.PLATFORM)
+        platforms.create(50, 250, TEXTURE.PLATFORM)
+        platforms.create(750, 220, TEXTURE.PLATFORM)
         return platforms
     }
 
